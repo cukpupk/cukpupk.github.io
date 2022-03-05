@@ -6,7 +6,7 @@
     <description>Recent content on ShiWen&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 08 Jun 2010 08:06:25 +0600</lastBuildDate><atom:link href="https://cukpupk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 05 Mar 2022 08:06:25 +0600</lastBuildDate><atom:link href="https://cukpupk.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Resultados de Búsqueda</title>
       <link>https://cukpupk.github.io/search/</link>
@@ -330,6 +330,15 @@ No content shown here is rendered, all content is based in the template layouts/
 Setting a very low sitemap priority will tell search engines this is not important content.
 This implementation uses Fusejs, jquery and mark.js
 Initial setup Search depends on additional output content type of JSON in config.toml ``` [outputs] home = [&amp;ldquo;HTML&amp;rdquo;, &amp;ldquo;JSON&amp;rdquo;] ```</description>
+    </item>
+    
+    <item>
+      <title>Performance Improvement using indexdb</title>
+      <link>https://cukpupk.github.io/posts/performance-improvement-using-indexdb/</link>
+      <pubDate>Sat, 05 Mar 2022 08:06:25 +0600</pubDate>
+      
+      <guid>https://cukpupk.github.io/posts/performance-improvement-using-indexdb/</guid>
+      <description>Nowadays, image sizes are getting larger while user experience is one of the critical factor evaluating the website. To ensure good user experience, performance enhancement toward images require engineer to do deep improvement. Here I am going to introduce method using indexDb to store large images and the website will not need to fetch the image once reload or reenter into the page. This work on when these images are viewed on high frequency and seldom changed.</description>
     </item>
     
     <item>

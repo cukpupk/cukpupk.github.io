@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Performance Improvement using indexdb</title>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="/css/layouts/main.css"/>
+<link rel="stylesheet" href="/css/navigators/navbar.css"/>
+<link rel="stylesheet" href="/css/plyr.css"/>
+<link rel="stylesheet" href="/css/flag-icon.min.css"/>
+<link rel="stylesheet" href="/css/katex.min.css">
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+
+
+
+
+<meta property="og:title" content="Performance Improvement using indexdb" />
+<meta property="og:description" content="Using IndexDb cache images" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cukpupk.github.io/posts/performance-improvement-using-indexdb/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-03-05T08:06:25&#43;06:00" />
+<meta property="article:modified_time" content="2022-03-05T08:06:25&#43;06:00" />
+
+
+
+    
+    
+<meta name="description" content="Using IndexDb cache images" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css"
+/>
+<link rel="stylesheet" href="/css/layouts/single.css"/>
+<link rel="stylesheet" href="/css/navigators/sidebar.css">
+
+<link rel="stylesheet" href="/css/style.css"/>
+
+
+
+    
+    
+  </head>
+
+  <body data-spy="scroll" data-target="#TableOfContents" data-offset="80">
+    <div class="container-fluid bg-dimmed wrapper">
+      
+      
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-xl top-navbar final-navbar shadow">
+  <div class="container">
+      <button class="navbar-toggler navbar-light" id="sidebar-toggler" type="button" onclick="toggleSidebar()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="/">
+      ShiWen&#39;s Blog</a>
+    <button class="navbar-toggler navbar-light" id="toc-toggler" type="button" onclick="toggleTOC()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse lang-selector" id="top-nav-items">
+      <ul class="navbar-nav ml-auto">
+      
+      </ul>
+    </div>
+  </div>
+  
+  
+  
+</nav>
+
+
+
+      
+      
+  <section class="sidebar-section" id="sidebar-section">
+    <div class="sidebar-holder">
+      <div class="sidebar" id="sidebar">
+        <form class="mx-auto" method="get" action="/search">
+          <input type="text" name="keyword" value="" placeholder="Search" data-search="" id="search-box" />
+        </form>
+        <div class="sidebar-tree">
+          <ul class="tree" id="tree">
+            <li id="list-heading"><a href="/posts" data-filter="all"></a></li>
+            <div class="subtree">
+                
+  
+  
+  
+  
+    
+    
+  
+  
+    
+    <li><a class="active" href="/posts/performance-improvement-using-indexdb/" title="Markdown Sample">Markdown Sample</a></li>
+  
+
+
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+      
+      
+<section class="content-section" id="content-section">
+  <div class="content">
+    <div class="container p-0 read-area">
+      
+      <div class="hero-area col-sm-12" id="hero-area" style='background-image: url(https://cukpupk.github.io/images/default-hero.jpg);'>
+      </div>
+
+      
+      <div class="page-content">
+        <div class="author-profile ml-auto align-self-lg-center">
+          <img class="rounded-circle" src='/images/author/john_hu7f9991f5b5d471ecdfc6cff3db1a9fe6_6397_120x120_fit_box_2.png' alt="Author Image">
+          <h5 class="author-name">Shiwen</h5>
+          <p>:date_full</p>
+        </div>
+
+        <div class="title">
+          <h1>Performance Improvement using indexdb</h1>
+        </div>
+        
+        <div class="post-content" id="post-content">
+          <h2 id="nowadays-image-sizes-are-getting-larger-while-user-experience-is-one-of-the-critical-factor-evaluating-the-website-to-ensure-good-user-experience-performance-enhancement-toward-images-require-engineer-to-do-deep-improvement-here-i-am-going-to-introduce-method-using-indexdb-to-store-large-images-and-the-website-will-not-need-to-fetch-the-image-once-reload-or-reenter-into-the-page-this-work-on-when-these-images-are-viewed-on-high-frequency-and-seldom-changed">Nowadays, image sizes are getting larger while user experience is one of the critical factor evaluating the website. To ensure good user experience, performance enhancement toward images require engineer to do deep improvement. Here I am going to introduce method using indexDb to store large images and the website will not need to fetch the image once reload or reenter into the page. This work on when these images are viewed on high frequency and seldom changed.</h2>
+<blockquote>
+<p>Most of the time. To use indexDb needs complicated api according to MDN. However, there are some third-party library that can work through. Here I am introducing dexie</p>
+</blockquote>
+<hr>
+<p><a href="https://dexie.org/">https://dexie.org/</a></p>
+<hr>
+<p>Yarn</p>
+<blockquote>
+<p>yarn add dexie</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>yarn add dexie-react-hooks</p>
+</blockquote>
+<hr>
+<p>NPM</p>
+<blockquote>
+<p>npm install dexie</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>npm install dexie-react-hooks</p>
+</blockquote>
+<hr>
+<p>then</p>
+<blockquote>
+<p>Create a file db.js (or db.ts)</p>
+</blockquote>
+<h2 id="code-blocks">Code Blocks</h2>
+<h4 id="code-block-with-backticks">Code block with backticks</h4>
+<pre><code>import Dexie from 'dexie'
+
+export const db = new Dexie('myDatabase')
+
+db.version(1).stores({
+  projectImages: '++id, name, url, objectUrl'
+})
+</code></pre><h4 id="import-db-file-and-use-it-after-getting-response-from-back-end-we-are-going-to-connect-to-the-db-and-store-the-images-into-the-db-but-first-of-all-what-we-have-is-a-string-url-we-need-to-fetch-the-image-from-url-and-convert-to-base64">import db file and use it after getting response from back end. We are going to connect to the DB and store the images into the DB. But first of all, what we have is a string url, we need to fetch the image from url and convert to base64</h4>
+<pre><code> export const toDataURL = url =&gt; fetch(url)
+     .then(response =&gt; response.blob())
+     .then(blob =&gt; new Promise((resolve, reject) =&gt; {
+       const reader = new FileReader()
+       reader.onloadend = () =&gt; resolve(reader.result)
+       reader.onerror = reject
+       reader.readAsDataURL(blob)
+     }))
+</code></pre>
+<h4 id="then-we-are-going-to-store-the-url-and-the-base64-image-into-db-we-are-going-to-use-url-as-our-key-to-compare-the-image-from-response-and-image-at-local-db-if-urls-are-different-we-are-going-to-refetch-the-image-and-cache-it-at-db-otherwise-we-use-base64-image-at-db">Then we are going to store the url and the base64 image into db. We are going to use url as our key to compare the image from response and image at local db. If urls are different, we are going to refetch the image and cache it at db, otherwise we use base64 image at db.</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"> let results = response.results //response from backend. Response is an object arr contains images info
+for (const item of results) {
+        try {
+          const imageUrlArr = await db.projectImages.where(&#34;url&#34;).equalsIgnoreCase(item.logo.imgUri).toArray()
+          if(imageUrlArr.length &gt; 0) {
+            item.objectUrl = imageUrlArr[0].objectUrl
+          } else {
+            if(item.logo.imgUri !== &#39;&#39; <span style="color:#960050;background-color:#1e0010">&amp;&amp;</span> item.logo.imgUri !== null) {
+              toDataURL(item.logo.imgUri).then(dataUrl =&gt; {
+                db.projectImages.add({
+                  name: item.name,
+                  url: item.logo.imgUri,
+                  objectUrl: dataUrl
+                })
+              })
+            }
+          }
+        } catch (error) {
+          console.log(error)
+          db.projectImages.clear()
+        }
+      }</code></pre></div>
+<blockquote>
+<p>Now we implement the functionality that cache the images on local and do not need to fetch each image every time we get the response from backend. Images will immediately display after we get the response. User experience enhanced!</p>
+</blockquote>
+<h2 id="we-are-not-finished-yet-although-indexdb-is-very-large-compare-to-5mb-limit-size-of-localstorage-and-sessionstorage-we-need-to-check-whether-the-storage-has-enough-space-to-cache-different-browser-has-different-strategies-toward-indexdb">We are not finished yet. Although indexdb is very large compare to 5mb limit size of localStorage and sessionStorage. We need to check whether the storage has enough space to cache. Different Browser has different strategies toward indexDb.</h2>
+<p>The maximum browser storage space is dynamic — it is based on your hard drive size. The global limit is calculated as 50% of free disk space. In Firefox, an internal browser tool called the Quota Manager keeps track of how much disk space each origin is using up, and deletes data if necessary.</p>
+<p>So if the free space on your hard drive is 500 GB, then the total storage for a browser is 250 GB. If this is exceeded, a process called origin eviction comes into play, deleting an entire origin&rsquo;s worth of data until the storage amount goes under the limit again. There is no trimming effect put in place to delete parts of origins — deleting one database of an origin could cause problems with inconsistency.</p>
+<p>There&rsquo;s also another limit called group limit — this is defined as 20% of the global limit, but it has a minimum of 10 MB and a maximum of 2 GB.</p>
+<h2 id="we-use-storageestimate-api-to-detect-the-rest-of-the-storage-size-and-clean-the-db-by-selecting-most-unused-images-every-time-the-storage-size-hits-the-bar-i-set-20-of-the-total-size-here">We use StorageEstimate API to detect the rest of the storage size. And Clean the db by selecting most unused images every time the storage size hits the bar. I set 20% of the total size here.</h2>
+<blockquote>
+<p>Chrome allow browser to use at most 80% disk size。One single source can use up to 60% of disk.You can use StorageManager API to check the max usable size.</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Internet Explorer 10 or higher version can store up to 250 MB, and will warn user when use more than 10 MB</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Firefox allow browser to use at most 50% disk size. eTLD+1 group（like example.com;www.example.com ; foo.bar.example.com）use up to 2 GB. You can use StorageManager API to check the max usable size.</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Safari（desktop and mobile）allow up to 1 GB. When it hits the limit, Safari will warn user and increase the storage size once by 200 MB.</p>
+</blockquote>
+<hr>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">if (navigator.storage <span style="color:#960050;background-color:#1e0010">&amp;&amp;</span> navigator.storage.estimate) {
+  const quota = await navigator.storage.estimate();
+  // quota.usage -&gt; Bytes used
+  // quota.quota -&gt; Max Bytes can be used
+  const percentageUsed = (quota.usage / quota.quota) * 100;
+  console.log(`You have used ${percentageUsed}%。`);
+  const remaining = quota.quota - quota.usage;
+  console.log(`You can write ${remaining} Bytes more`);
+}</code></pre></div>
+
+        </div>
+
+        
+        <div class="row pl-3 pr-3">
+        
+        <div class="col-md-6 share-buttons">
+        
+          </div>
+
+        
+        
+          
+            
+          
+          <div class="col-md-6 btn-improve-page">
+             
+               <a href="https://github.com/cukpupk/cukpupk.github.io/edit/main/content/posts/Performance-Improvement-using-indexdb/index.md" title="" target="_blank" rel="noopener">
+            
+                <i class="fas fa-code-branch"></i>
+                
+              </a>
+          </div>
+        
+        </div>
+
+
+
+      
+      <hr />
+        
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+    
+    
+  
+  
+
+
+<div class="row next-prev-navigator">
+  
+  
+</div>
+
+      <hr />
+
+      
+      
+      
+      
+
+      </div>
+    </div>
+  </div>
+  
+  <a id="scroll-to-top" class="btn"><i class="fas fa-chevron-circle-up"></i></a>
+  
+</section>
+
+
+      
+      
+  <section class="toc-section" id="toc-section">
+    
+    <div class="toc-holder">
+      <h5 class="text-center pl-3"></h5>
+      <hr>
+      <div class="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#nowadays-image-sizes-are-getting-larger-while-user-experience-is-one-of-the-critical-factor-evaluating-the-website-to-ensure-good-user-experience-performance-enhancement-toward-images-require-engineer-to-do-deep-improvement-here-i-am-going-to-introduce-method-using-indexdb-to-store-large-images-and-the-website-will-not-need-to-fetch-the-image-once-reload-or-reenter-into-the-page-this-work-on-when-these-images-are-viewed-on-high-frequency-and-seldom-changed">Nowadays, image sizes are getting larger while user experience is one of the critical factor evaluating the website. To ensure good user experience, performance enhancement toward images require engineer to do deep improvement. Here I am going to introduce method using indexDb to store large images and the website will not need to fetch the image once reload or reenter into the page. This work on when these images are viewed on high frequency and seldom changed.</a></li>
+    <li><a href="#code-blocks">Code Blocks</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#code-block-with-backticks">Code block with backticks</a></li>
+            <li><a href="#import-db-file-and-use-it-after-getting-response-from-back-end-we-are-going-to-connect-to-the-db-and-store-the-images-into-the-db-but-first-of-all-what-we-have-is-a-string-url-we-need-to-fetch-the-image-from-url-and-convert-to-base64">import db file and use it after getting response from back end. We are going to connect to the DB and store the images into the DB. But first of all, what we have is a string url, we need to fetch the image from url and convert to base64</a></li>
+            <li><a href="#then-we-are-going-to-store-the-url-and-the-base64-image-into-db-we-are-going-to-use-url-as-our-key-to-compare-the-image-from-response-and-image-at-local-db-if-urls-are-different-we-are-going-to-refetch-the-image-and-cache-it-at-db-otherwise-we-use-base64-image-at-db">Then we are going to store the url and the base64 image into db. We are going to use url as our key to compare the image from response and image at local db. If urls are different, we are going to refetch the image and cache it at db, otherwise we use base64 image at db.</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#we-are-not-finished-yet-although-indexdb-is-very-large-compare-to-5mb-limit-size-of-localstorage-and-sessionstorage-we-need-to-check-whether-the-storage-has-enough-space-to-cache-different-browser-has-different-strategies-toward-indexdb">We are not finished yet. Although indexdb is very large compare to 5mb limit size of localStorage and sessionStorage. We need to check whether the storage has enough space to cache. Different Browser has different strategies toward indexDb.</a></li>
+    <li><a href="#we-use-storageestimate-api-to-detect-the-rest-of-the-storage-size-and-clean-the-db-by-selecting-most-unused-images-every-time-the-storage-size-hits-the-bar-i-set-20-of-the-total-size-here">We use StorageEstimate API to detect the rest of the storage size. And Clean the db by selecting most unused images every time the storage size hits the bar. I set 20% of the total size here.</a></li>
+  </ul>
+</nav>
+      </div>
+    </div>
+    
+  </section>
+
+    </div>
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+  
+    
+  
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+
+  
+  
+    
+    
+      
+    
+  
+
+
+  
+  
+  
+
+  
+  
+  
+
+  
+  
+  
+    
+  
+  
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="/js/popper.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="/js/navbar.js"></script>
+<script type="text/javascript" src="/js/plyr.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" defer src="/js/katex.min.js"></script>
+<script type="text/javascript" defer src="/js/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+<script src="/js/single.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);">
+</script>
+
+
+
+  </body>
+</html>
